@@ -17,3 +17,9 @@ services:
       - ./windows:/storage
     restart: always
     stop_grace_period: 2m
+environment:
+  RAM_SIZE: "12G"
+  CPU_CORES: "4"
+environment:
+  USERNAME: "giang"
+  PASSWORD: "admin"
