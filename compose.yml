@@ -1,25 +1,24 @@
+version: '3.8'
 services:
   windows:
-    image: dockurr/windows
-    container_name: windows
+    image: dockurr/windows  # Sử dụng image Windows từ Dockurr
+    container_name: windows  # Đặt tên container
     environment:
-      VERSION: "2012"
+      VERSION: "2012"       # Phiên bản Windows Server 2012
+      RAM_SIZE: "12G"       # Cấp 12GB RAM cho máy ảo
+      CPU_CORES: "4"        # Sử dụng 4 CPU cores
+      USERNAME: "giang"     # Tên đăng nhập
+      PASSWORD: "Namdinh@1984"  # Mật khẩu (cần bảo mật hơn)
     devices:
-      - /dev/kvm
-      - /dev/net/tun
+      - /dev/kvm            # Yêu cầu truy cập phần cứng ảo hóa KVM
+      - /dev/net/tun        # Thiết bị mạng ảo
     cap_add:
-      - NET_ADMIN
+      - NET_ADMIN           # Quyền quản trị mạng
     ports:
-      - 8006:8006
-      - 3389:3389/tcp
-      - 3389:3389/udp
+      - 8006:8006           # Cổng giao diện web quản lý
+      - 3389:3389/tcp      # Cổng Remote Desktop (RDP)
+      - 3389:3389/udp       # Cổng RDP giao thức UDP
     volumes:
-      - ./windows:/storage
-    restart: always
-    stop_grace_period: 2m
-environment:
-  RAM_SIZE: "12G"
-  CPU_CORES: "4"
-environment:
-  USERNAME: "giang"
-  PASSWORD: "Namdinh@1984"
+      - ./windows:/storage  # Lưu dữ liệu máy ảo ra thư mục ./windows
+    restart: always         # Tự động khởi động lại nếu bị tắt
+    stop_grace_period: 2m   # Thời gian chờ trước khi tắt container
