@@ -1,24 +1,38 @@
 version: '3.8'
 services:
-  windows:
-    image: dockurr/windows  # Sử dụng image Windows từ Dockurr
-    container_name: windows  # Đặt tên container
+  windows-server:
+    image: dockurr/windows:2012
+    container_name: win2012-vm
+    hostname: win2012-server
+    env_file: .env  # Sử dụng file .env để bảo mật thông tin nhạy cảm
     environment:
-      VERSION: "2012"       # Phiên bản Windows Server 2012
-      RAM_SIZE: "12G"       # Cấp 12GB RAM cho máy ảo
-      CPU_CORES: "4"        # Sử dụng 4 CPU cores
-      USERNAME: "giang"     # Tên đăng nhập
-      PASSWORD: "Namdinh@1984"  # Mật khẩu (cần bảo mật hơn)
+      VERSION: "2012"
+      RAM_SIZE: "12G"
+      CPU_CORES: "4"
+      DISK_SIZE: "50G"  # Thêm dung lượng ổ đĩa
+      TZ: "Asia/Ho_Chi_Minh"  # Múi giờ Việt Nam
+      RDP_RESOLUTION: "1920x1080"  # Độ phân giải RDP
     devices:
-      - /dev/kvm            # Yêu cầu truy cập phần cứng ảo hóa KVM
-      - /dev/net/tun        # Thiết bị mạng ảo
+      - /dev/kvm
+      - /dev/vhost-net
     cap_add:
-      - NET_ADMIN           # Quyền quản trị mạng
+      - NET_ADMIN
+      - SYS_ADMIN
     ports:
-      - 8006:8006           # Cổng giao diện web quản lý
-      - 3389:3389/tcp      # Cổng Remote Desktop (RDP)
-      - 3389:3389/udp       # Cổng RDP giao thức UDP
+      - 8006:8006  # Web GUI
+      - 3389:3389/tcp  # RDP
+      - 3389:3389/udp
     volumes:
-      - ./windows:/storage  # Lưu dữ liệu máy ảo ra thư mục ./windows
-    restart: always         # Tự động khởi động lại nếu bị tắt
-    stop_grace_period: 2m   # Thời gian chờ trước khi tắt container
+      - ./win-data:/storage  # Thư mục lưu dữ liệu
+      - ./iso:/iso  # Mount thư mục ISO nếu cần cài đặt
+    networks:
+      - win-net
+    restart: unless-stopped
+    stop_grace_period: 2m
+
+networks:
+  win-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24  # Cấu hình dải IP riêng
